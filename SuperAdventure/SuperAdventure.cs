@@ -22,9 +22,5 @@ namespace SuperAdventure
 
         }
 
-        private void BtnTest_Click(object sender, EventArgs e)
-        {
-            lblGold.Text = "123";
-        }
     }
 }
