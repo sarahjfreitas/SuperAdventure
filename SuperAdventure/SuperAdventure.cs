@@ -18,17 +18,16 @@ namespace SuperAdventure
         {
             InitializeComponent();
 
-            player = new Player();
-            player.CurrentHitPoints = 10;
-            player.MaximumHitPoints = 10;
-            player.Gold = 20;
-            player.ExperiencePoints = 0;
-            player.Level = 1;
+
+            player = new Player(10,10,20,0,1);
 
             lblExperience.Text = player.ExperiencePoints.ToString();
             lblGold.Text = player.Gold.ToString();
             lblLevel.Text = player.Level.ToString();
             lblHitPoints.Text = player.CurrentHitPoints.ToString();
+
+            Location location = new Location(1, "Home", "This is your house.");
+
         }
 
         private void SuperAdventure_Load(object sender, EventArgs e)
