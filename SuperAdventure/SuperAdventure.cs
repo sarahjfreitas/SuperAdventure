@@ -22,11 +22,7 @@ namespace SuperAdventure
             player = new Player(10,10,20,0,1);
             MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
             player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RUSTY_SWORD),1));
-
-            lblExperience.Text = player.ExperiencePoints.ToString();
-            lblGold.Text = player.Gold.ToString();
-            lblLevel.Text = player.Level.ToString();
-            lblHitPoints.Text = player.CurrentHitPoints.ToString();
+            RefreshPlayerInventoryList();
         }
         
 
@@ -52,8 +48,9 @@ namespace SuperAdventure
 
         private void MoveTo(Location newLocation)
         {
+            refreshPlayerStatus();
             // Does the location have any required items
-            if(!player.HasRequiredItemToEnterThisLocation(newLocation))
+            if (!player.HasRequiredItemToEnterThisLocation(newLocation))
             {                
                 rtbMessages.Text += "You must have a " + newLocation.ItemRequiredToEnter.Name + " to enter this location." + Environment.NewLine;
                 return;
@@ -75,7 +72,6 @@ namespace SuperAdventure
             // heal the player
             player.CurrentHitPoints = player.MaximumHitPoints;
             lblHitPoints.Text = player.CurrentHitPoints.ToString();
-
 
 
             // check if location has quest
@@ -253,6 +249,92 @@ namespace SuperAdventure
             {
                 dgvQuests.Rows.Add(new[] { playerQuest.Details.Name, playerQuest.IsCompleted.ToString() });
             }
+        }
+
+        private void BtnUseWeapon_Click(object sender, EventArgs e)
+        {
+            Weapon currentWeapon = (Weapon)cboWeapons.SelectedItem;
+
+            // hit monster
+            int damageToMoster = RandomNumberGenerator.NumberBetween(currentWeapon.MinimumDamage, currentWeapon.MaximumDamage);
+            currentMonster.CurrentHitPoints -= damageToMoster;
+            rtbMessages.Text += "You hit the " + currentMonster.Name + " for " + damageToMoster.ToString() + " points" + Environment.NewLine;
+
+            // check if monster is dead
+            if(currentMonster.CurrentHitPoints <= 0)
+            {
+                rtbMessages.Text += Environment.NewLine + "You defeated the " + currentMonster.Name + Environment.NewLine;
+                player.ExperiencePoints += currentMonster.RewardExperiencePoints;
+                rtbMessages.Text += "You receive " + currentMonster.RewardExperiencePoints.ToString() + " experience points" + Environment.NewLine;
+                rtbMessages.Text += "You receive " + currentMonster.RewardGold.ToString() + " gold" + Environment.NewLine;
+
+                // check and add droped items
+                List<InventoryItem> lootedItems = new List<InventoryItem>();
+                foreach(LootItem lootItem in currentMonster.LootTable)
+                {
+                    if (lootItem.IsDefaultItem)
+                    {
+                        lootedItems.Add(new InventoryItem(lootItem.Details, 1));
+                    }
+                    else if (RandomNumberGenerator.NumberBetween(1,100) <= lootItem.DropPercentage)
+                    {
+                        lootedItems.Add(new InventoryItem(lootItem.Details, 1));
+                    }
+                }
+
+                foreach(InventoryItem inventoryItem in lootedItems)
+                {
+                    player.AddItemToInventory(inventoryItem.Details);
+                    if(inventoryItem.Quantity == 1)
+                    {
+                        rtbMessages.Text += "You loot " + inventoryItem.Quantity + " " + inventoryItem.Details.Name + Environment.NewLine;
+                    }
+                    else
+                    {
+                        rtbMessages.Text += "You loot " + inventoryItem.Quantity + " " + inventoryItem.Details.NamePlural + Environment.NewLine;
+                    }
+                }
+
+                RefreshPlayerInventoryList();
+                RefreshPlayerPotionsList();
+                RefreshPlayerWeaponsList();
+
+                rtbMessages.Text += Environment.NewLine;
+
+                MoveTo(player.CurrentLocation);
+            }
+            else // monster is alive
+            {
+                int damageToPlayer = RandomNumberGenerator.NumberBetween(0, currentMonster.MaximumDamage);
+                rtbMessages.Text += "The " + currentMonster.Name + " did " + damageToPlayer.ToString() + " damage to you" + Environment.NewLine;
+                player.CurrentHitPoints -= damageToPlayer;
+                lblHitPoints.Text = player.CurrentHitPoints.ToString();
+                if(player.CurrentHitPoints <= 0)
+                {
+                    rtbMessages.Text += "The " + currentMonster.Name + " killed you." + Environment.NewLine;
+                    MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
+                }
+            }
+
+        }
+
+        private void BtnUsePotion_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void RtbMessages_TextChanged(object sender, EventArgs e)
+        {
+            rtbMessages.SelectionStart = rtbMessages.Text.Length;
+            rtbMessages.ScrollToCaret();
+        }
+
+        private void refreshPlayerStatus()
+        {
+            lblExperience.Text = player.ExperiencePoints.ToString();
+            lblGold.Text = player.Gold.ToString();
+            lblLevel.Text = player.Level.ToString();
+            lblHitPoints.Text = player.CurrentHitPoints.ToString();
         }
     }
 }

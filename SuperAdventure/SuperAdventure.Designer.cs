@@ -154,6 +154,7 @@
             this.btnUseWeapon.TabIndex = 11;
             this.btnUseWeapon.Text = "Use";
             this.btnUseWeapon.UseVisualStyleBackColor = true;
+            this.btnUseWeapon.Click += new System.EventHandler(this.BtnUseWeapon_Click);
             // 
             // btnUsePotion
             // 
@@ -163,6 +164,7 @@
             this.btnUsePotion.TabIndex = 12;
             this.btnUsePotion.Text = "Use";
             this.btnUsePotion.UseVisualStyleBackColor = true;
+            this.btnUsePotion.Click += new System.EventHandler(this.BtnUsePotion_Click);
             // 
             // btnNorth
             // 
@@ -221,6 +223,7 @@
             this.rtbMessages.Size = new System.Drawing.Size(360, 286);
             this.rtbMessages.TabIndex = 18;
             this.rtbMessages.Text = "";
+            this.rtbMessages.TextChanged += new System.EventHandler(this.RtbMessages_TextChanged);
             // 
             // dgvInventory
             // 
