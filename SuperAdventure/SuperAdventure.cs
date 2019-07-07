@@ -18,7 +18,6 @@ namespace SuperAdventure
         {
             InitializeComponent();
 
-
             player = new Player(10,10,20,0,1);
 
             lblExperience.Text = player.ExperiencePoints.ToString();
