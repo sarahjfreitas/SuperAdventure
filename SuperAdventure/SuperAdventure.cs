@@ -48,7 +48,6 @@ namespace SuperAdventure
 
         private void MoveTo(Location newLocation)
         {
-            refreshPlayerStatus();
             // Does the location have any required items
             if (!player.HasRequiredItemToEnterThisLocation(newLocation))
             {                
@@ -142,6 +141,7 @@ namespace SuperAdventure
             RefreshPlayerWeaponsList();
             RefreshPlayerInventoryList();
             RefreshPlayerPotionsList();
+            refreshPlayerStatus();
         }
 
         private void ShowCombatControls()
@@ -305,22 +305,41 @@ namespace SuperAdventure
             }
             else // monster is alive
             {
-                int damageToPlayer = RandomNumberGenerator.NumberBetween(0, currentMonster.MaximumDamage);
-                rtbMessages.Text += "The " + currentMonster.Name + " did " + damageToPlayer.ToString() + " damage to you" + Environment.NewLine;
-                player.CurrentHitPoints -= damageToPlayer;
-                lblHitPoints.Text = player.CurrentHitPoints.ToString();
-                if(player.CurrentHitPoints <= 0)
-                {
-                    rtbMessages.Text += "The " + currentMonster.Name + " killed you." + Environment.NewLine;
-                    MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
-                }
+                MonsterAtack();
             }
 
         }
 
         private void BtnUsePotion_Click(object sender, EventArgs e)
         {
+            HealingPotion potion = (HealingPotion)cboPotions.SelectedItem;
+            player.CurrentHitPoints += potion.AmountToHeal;
+            if(player.CurrentHitPoints > player.MaximumHitPoints)
+            {
+                player.CurrentHitPoints = player.MaximumHitPoints;
+            }
+            player.RemoveItemFromInventory(potion);
 
+            rtbMessages.Text += "You drink a " + potion.Name + Environment.NewLine;
+            RefreshPlayerInventoryList();
+            RefreshPlayerPotionsList();
+
+            MonsterAtack();
+
+        }
+
+        private void MonsterAtack()
+        {
+            int damageToPlayer = RandomNumberGenerator.NumberBetween(0, currentMonster.MaximumDamage);
+            rtbMessages.Text += "The " + currentMonster.Name + " did " + damageToPlayer.ToString() + " damage to you" + Environment.NewLine;
+            player.CurrentHitPoints -= damageToPlayer;
+            lblHitPoints.Text = player.CurrentHitPoints.ToString();
+            if (player.CurrentHitPoints <= 0)
+            {
+                rtbMessages.Text += "The " + currentMonster.Name + " killed you." + Environment.NewLine;
+                MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
+            }
+            refreshPlayerStatus();
         }
 
         private void RtbMessages_TextChanged(object sender, EventArgs e)

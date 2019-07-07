@@ -130,5 +130,17 @@ namespace Engine
                 }
             }
         }
+
+        public void RemoveItemFromInventory(Item itemToRemove,int quantity = 1)
+        {
+            foreach (InventoryItem item in Inventory)
+            {
+                if (item.Details.ID == itemToRemove.ID)
+                {
+                    item.Quantity -= quantity;
+                    break;
+                }
+            }
+        }
     }
 }
