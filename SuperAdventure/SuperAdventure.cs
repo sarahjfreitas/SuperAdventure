@@ -354,12 +354,14 @@ namespace SuperAdventure
             lblExperience.Text = player.ExperiencePoints.ToString();
             lblGold.Text = player.Gold.ToString();
             lblLevel.Text = player.Level.ToString();
-            lblHitPoints.Text = player.CurrentHitPoints.ToString();
+            lblHitPoints.Text = player.CurrentHitPoints.ToString() + "/" + player.MaximumHitPoints.ToString();
+            barHP.updateHp(player.CurrentHitPoints, player.MaximumHitPoints);
         }
 
         private void SuperAdventure_FormClosing(object sender, FormClosingEventArgs e)
         {
             File.WriteAllText(PLAYER_DATA_FILE_NAME, player.ToXmlString());
         }
+
     }
 }
