@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Engine;
+using System.IO;
 
 namespace SuperAdventure
 {
     public partial class SuperAdventure : Form
     {
+        private const string PLAYER_DATA_FILE_NAME = "PlayerData.xml";
         private Player player;
         private Monster currentMonster;
         public SuperAdventure()
         {
             InitializeComponent();
 
-            player = new Player(10,10,20,0,1);
-            MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
-            player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RUSTY_SWORD),1));
-            RefreshPlayerInventoryList();
+            if (File.Exists(PLAYER_DATA_FILE_NAME))
+            {
+                player = Player.CreatePlayerFromXmlString(File.ReadAllText(PLAYER_DATA_FILE_NAME));
+            }
+            else
+            {
+                player = Player.CreateDefaultPlayer();
+            }
+            MoveTo(player.CurrentLocation);
         }
         
 
@@ -354,6 +355,11 @@ namespace SuperAdventure
             lblGold.Text = player.Gold.ToString();
             lblLevel.Text = player.Level.ToString();
             lblHitPoints.Text = player.CurrentHitPoints.ToString();
+        }
+
+        private void SuperAdventure_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            File.WriteAllText(PLAYER_DATA_FILE_NAME, player.ToXmlString());
         }
     }
 }
